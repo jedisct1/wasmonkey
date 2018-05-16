@@ -23,6 +23,8 @@ use parity_wasm::elements::{
 use sections::*;
 use std::path::Path;
 
+pub const BUILTIN_PREFIX: &str = "builtin_";
+
 #[derive(Debug)]
 pub struct Builtin {
     pub name: String,
@@ -40,7 +42,7 @@ impl Builtin {
     }
 
     pub fn import_name(&self) -> String {
-        format!("builtin_{}", self.name)
+        format!("{}{}", BUILTIN_PREFIX, self.name)
     }
 }
 
@@ -160,8 +162,8 @@ fn main() -> Result<(), WError> {
     let builtins_names: Vec<&str> = symbols
         .symbols
         .iter()
-        .filter(|symbol| symbol.name.starts_with("builtin_"))
-        .map(|symbol| &symbol.name["builtin_".len()..])
+        .filter(|symbol| symbol.name.starts_with(BUILTIN_PREFIX))
+        .map(|symbol| &symbol.name[BUILTIN_PREFIX.len()..])
         .collect();
     patch_file(config.input_path, config.output_path, &builtins_names)?;
     Ok(())
