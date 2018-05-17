@@ -179,26 +179,28 @@ fn patch_file<P: AsRef<Path>>(
     Ok(patched_builtins_map)
 }
 
-fn write_builtins_map<P: AsRef<Path>>(
-    builtins_map_path: P,
-    patched_builtins_map: &PatchedBuiltinsMap,
-    original_names: bool,
-) -> Result<(), WError> {
-    let mut map_with_original_names;
-    let map = if original_names {
-        patched_builtins_map
-    } else {
-        map_with_original_names = PatchedBuiltinsMap::default();
-        for imported_name in patched_builtins_map.env.values() {
-            map_with_original_names
-                .env
-                .insert(imported_name.clone(), imported_name.clone());
-        }
-        &map_with_original_names
-    };
-    let json = serde_json::to_string_pretty(map).map_err(|_| WError::ParseError)?;
-    File::create(builtins_map_path)?.write_all(json.as_bytes())?;
-    Ok(())
+impl PatchedBuiltinsMap {
+    pub fn write_to_file<P: AsRef<Path>>(
+        &self,
+        builtins_map_path: P,
+        original_names: bool,
+    ) -> Result<(), WError> {
+        let mut map_with_original_names;
+        let map = if original_names {
+            self
+        } else {
+            map_with_original_names = PatchedBuiltinsMap::default();
+            for imported_name in self.env.values() {
+                map_with_original_names
+                    .env
+                    .insert(imported_name.clone(), imported_name.clone());
+            }
+            &map_with_original_names
+        };
+        let json = serde_json::to_string_pretty(map).map_err(|_| WError::ParseError)?;
+        File::create(builtins_map_path)?.write_all(json.as_bytes())?;
+        Ok(())
+    }
 }
 
 fn main() -> Result<(), WError> {
@@ -207,11 +209,7 @@ fn main() -> Result<(), WError> {
     let builtins_names = symbols.builtins_names();
     let patched_builtins_map = patch_file(config.input_path, config.output_path, &builtins_names)?;
     if let Some(builtins_map_path) = config.builtins_map_path {
-        write_builtins_map(
-            builtins_map_path,
-            &patched_builtins_map,
-            config.builtins_map_original_names,
-        )?;
+        patched_builtins_map.write_to_file(builtins_map_path, config.builtins_map_original_names)?;
     }
     Ok(())
 }
