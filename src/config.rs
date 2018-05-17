@@ -8,6 +8,7 @@ pub struct Config {
     pub output_path: PathBuf,
     pub builtins_path: PathBuf,
     pub builtins_map_path: Option<PathBuf>,
+    pub builtins_map_original_names: bool,
 }
 
 impl Config {
@@ -47,6 +48,14 @@ impl Config {
                     .required(false)
                     .help("Path to the builtins map file"),
             )
+            .arg(
+                Arg::with_name("builtins_map_original_names")
+                    .short("n")
+                    .long("original-names")
+                    .takes_value(false)
+                    .required(false)
+                    .help("Use the original name as a key in the builtins map"),
+            )
             .get_matches();
         let input_path = PathBuf::from(matches
             .value_of("input_file")
@@ -60,11 +69,13 @@ impl Config {
         let builtins_map_path = matches
             .value_of("builtins_map_file")
             .map(|path| PathBuf::from(path));
+        let builtins_map_original_names = matches.is_present("builtins_map_original_names");
         let config = Config {
             input_path,
             output_path,
             builtins_path,
             builtins_map_path,
+            builtins_map_original_names,
         };
         Ok(config)
     }

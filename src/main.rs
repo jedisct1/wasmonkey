@@ -125,7 +125,7 @@ fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> R
     Ok(())
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 struct PatchedBuiltinsMap {
     env: HashMap<String, String>,
 }
@@ -182,8 +182,21 @@ fn patch_file<P: AsRef<Path>>(
 fn write_builtins_map<P: AsRef<Path>>(
     builtins_map_path: P,
     patched_builtins_map: &PatchedBuiltinsMap,
+    original_names: bool,
 ) -> Result<(), WError> {
-    let json = serde_json::to_string_pretty(&patched_builtins_map).map_err(|_| WError::ParseError)?;
+    let mut map_with_original_names;
+    let map = if original_names {
+        patched_builtins_map
+    } else {
+        map_with_original_names = PatchedBuiltinsMap::default();
+        for imported_name in patched_builtins_map.env.values() {
+            map_with_original_names
+                .env
+                .insert(imported_name.clone(), imported_name.clone());
+        }
+        &map_with_original_names
+    };
+    let json = serde_json::to_string_pretty(map).map_err(|_| WError::ParseError)?;
     File::create(builtins_map_path)?.write_all(json.as_bytes())?;
     Ok(())
 }
@@ -194,7 +207,11 @@ fn main() -> Result<(), WError> {
     let builtins_names = symbols.builtins_names();
     let patched_builtins_map = patch_file(config.input_path, config.output_path, &builtins_names)?;
     if let Some(builtins_map_path) = config.builtins_map_path {
-        write_builtins_map(builtins_map_path, &patched_builtins_map)?;
+        write_builtins_map(
+            builtins_map_path,
+            &patched_builtins_map,
+            config.builtins_map_original_names,
+        )?;
     }
     Ok(())
 }

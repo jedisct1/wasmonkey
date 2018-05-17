@@ -9,8 +9,9 @@ functions with imported functions from another library.
     wasmonkey [OPTIONS] --builtins <builtins_file> --input <input_file> --output <output_file>
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -n, --original-names    Use the original name as a key in the builtins map
+    -h, --help              Prints help information
+    -V, --version           Prints version information
 
 OPTIONS:
     -b, --builtins <builtins_file>            Path to the builtins library
