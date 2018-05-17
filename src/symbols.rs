@@ -1,8 +1,8 @@
 use super::BUILTIN_PREFIX;
 use errors::*;
+use goblin::Object;
 use goblin::elf::Elf;
 use goblin::mach::{self, Mach, MachO};
-use goblin::Object;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -25,8 +25,7 @@ impl From<Vec<ExtractedSymbol>> for ExtractedSymbols {
 
 impl ExtractedSymbols {
     pub fn builtins_names(&self) -> Vec<&str> {
-        let builtins_names: Vec<&str> = self
-            .symbols
+        let builtins_names: Vec<&str> = self.symbols
             .iter()
             .filter(|symbol| symbol.name.starts_with(BUILTIN_PREFIX))
             .map(|symbol| &symbol.name[BUILTIN_PREFIX.len()..])
@@ -38,13 +37,11 @@ impl ExtractedSymbols {
 fn parse_elf(elf: &Elf) -> Result<ExtractedSymbols, WError> {
     let mut symbols = vec![];
 
-    for symbol in elf
-        .dynsyms
+    for symbol in elf.dynsyms
         .iter()
         .filter(|symbol| symbol.st_info == 0x12 || symbol.st_info == 0x22)
     {
-        let name = elf
-            .dynstrtab
+        let name = elf.dynstrtab
             .get(symbol.st_name)
             .ok_or(WError::ParseError)?
             .map_err(|_| WError::ParseError)?
@@ -55,10 +52,6 @@ fn parse_elf(elf: &Elf) -> Result<ExtractedSymbols, WError> {
     Ok(symbols.into())
 }
 
-// Mach-O symbols don't include any sizes, so we need to extract all the symbols
-// from the text section, and for each symbol, find the one with the smallest
-// offset immediately after the reference symbol, in order to guess the reference
-// symbol's size (alignment included).
 fn parse_macho(macho: &MachO) -> Result<ExtractedSymbols, WError> {
     let mut symbols = vec![];
 
