@@ -3,6 +3,8 @@ extern crate clap;
 extern crate failure;
 extern crate goblin;
 extern crate parity_wasm;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
 #[macro_use]
 extern crate xfailure;
@@ -123,7 +125,10 @@ fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> R
     Ok(())
 }
 
-type PatchedBuiltinsMap = HashMap<String, String>;
+#[derive(Debug, Serialize)]
+struct PatchedBuiltinsMap {
+    env: HashMap<String, String>,
+}
 
 fn patch_module(
     module: Module,
@@ -152,9 +157,13 @@ fn patch_module(
         disable_function_id(&mut module, original_function_id)?;
     }
 
-    let mut patched_builtins_map = HashMap::with_capacity(builtins.len());
+    let mut patched_builtins_map = PatchedBuiltinsMap {
+        env: HashMap::with_capacity(builtins.len()),
+    };
     for builtin in builtins {
-        patched_builtins_map.insert(builtin.name.clone(), builtin.import_name());
+        patched_builtins_map
+            .env
+            .insert(builtin.name.clone(), builtin.import_name());
     }
     Ok((module, patched_builtins_map))
 }
