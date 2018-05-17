@@ -1,3 +1,4 @@
+use super::BUILTIN_PREFIX;
 use errors::*;
 use goblin::elf::Elf;
 use goblin::mach::{self, Mach, MachO};
@@ -19,6 +20,18 @@ pub struct ExtractedSymbols {
 impl From<Vec<ExtractedSymbol>> for ExtractedSymbols {
     fn from(symbols: Vec<ExtractedSymbol>) -> Self {
         ExtractedSymbols { symbols }
+    }
+}
+
+impl ExtractedSymbols {
+    pub fn builtins_names(&self) -> Vec<&str> {
+        let builtins_names: Vec<&str> = self
+            .symbols
+            .iter()
+            .filter(|symbol| symbol.name.starts_with(BUILTIN_PREFIX))
+            .map(|symbol| &symbol.name[BUILTIN_PREFIX.len()..])
+            .collect();
+        builtins_names
     }
 }
 
@@ -101,7 +114,7 @@ fn parse_macho(macho: &MachO) -> Result<ExtractedSymbols, WError> {
     Ok(symbols.into())
 }
 
-pub fn exported_symbols<P: AsRef<Path>>(path: P) -> Result<ExtractedSymbols, WError> {
+pub fn extract_symbols<P: AsRef<Path>>(path: P) -> Result<ExtractedSymbols, WError> {
     let mut buffer = Vec::new();
     File::open(path)?.read_to_end(&mut buffer)?;
     let symbols = match Object::parse(&buffer).map_err(|_| WError::ParseError)? {

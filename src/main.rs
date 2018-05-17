@@ -181,13 +181,8 @@ fn write_builtins_map<P: AsRef<Path>>(
 
 fn main() -> Result<(), WError> {
     let config = Config::parse_cmdline()?;
-    let symbols = symbols::exported_symbols(config.builtins_path)?;
-    let builtins_names: Vec<&str> = symbols
-        .symbols
-        .iter()
-        .filter(|symbol| symbol.name.starts_with(BUILTIN_PREFIX))
-        .map(|symbol| &symbol.name[BUILTIN_PREFIX.len()..])
-        .collect();
+    let symbols = symbols::extract_symbols(config.builtins_path)?;
+    let builtins_names = symbols.builtins_names();
     let patched_builtins_map = patch_file(config.input_path, config.output_path, &builtins_names)?;
     if let Some(builtins_map_path) = config.builtins_map_path {
         write_builtins_map(builtins_map_path, &patched_builtins_map)?;
