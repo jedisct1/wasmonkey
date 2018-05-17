@@ -13,6 +13,7 @@ mod config;
 mod errors;
 mod functions_ids;
 mod functions_names;
+mod map;
 mod sections;
 mod symbols;
 
@@ -20,13 +21,11 @@ use config::*;
 use errors::*;
 use functions_ids::*;
 use functions_names::*;
+use map::*;
 use parity_wasm::elements::{
     self, External, ImportEntry, ImportSection, Internal, Module, NameSection, Section,
 };
 use sections::*;
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::prelude::*;
 use std::path::Path;
 
 pub const BUILTIN_PREFIX: &str = "builtin_";
@@ -125,11 +124,6 @@ fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> R
     Ok(())
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
-struct PatchedBuiltinsMap {
-    env: HashMap<String, String>,
-}
-
 fn patch_module(
     module: Module,
     builtins_names: &[&str],
@@ -157,13 +151,9 @@ fn patch_module(
         disable_function_id(&mut module, original_function_id)?;
     }
 
-    let mut patched_builtins_map = PatchedBuiltinsMap {
-        env: HashMap::with_capacity(builtins.len()),
-    };
+    let mut patched_builtins_map = PatchedBuiltinsMap::with_capacity(builtins.len());
     for builtin in builtins {
-        patched_builtins_map
-            .env
-            .insert(builtin.name.clone(), builtin.import_name());
+        patched_builtins_map.insert(builtin.name.clone(), builtin.import_name());
     }
     Ok((module, patched_builtins_map))
 }
@@ -177,30 +167,6 @@ fn patch_file<P: AsRef<Path>>(
     let (patched_module, patched_builtins_map) = patch_module(module, builtins_names)?;
     elements::serialize_to_file(path_out, patched_module)?;
     Ok(patched_builtins_map)
-}
-
-impl PatchedBuiltinsMap {
-    pub fn write_to_file<P: AsRef<Path>>(
-        &self,
-        builtins_map_path: P,
-        original_names: bool,
-    ) -> Result<(), WError> {
-        let mut map_with_original_names;
-        let map = if original_names {
-            self
-        } else {
-            map_with_original_names = PatchedBuiltinsMap::default();
-            for imported_name in self.env.values() {
-                map_with_original_names
-                    .env
-                    .insert(imported_name.clone(), imported_name.clone());
-            }
-            &map_with_original_names
-        };
-        let json = serde_json::to_string_pretty(map).map_err(|_| WError::ParseError)?;
-        File::create(builtins_map_path)?.write_all(json.as_bytes())?;
-        Ok(())
-    }
 }
 
 fn main() -> Result<(), WError> {
