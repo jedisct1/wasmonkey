@@ -3,6 +3,7 @@ extern crate clap;
 extern crate failure;
 extern crate goblin;
 extern crate parity_wasm;
+extern crate serde_json;
 #[macro_use]
 extern crate xfailure;
 
@@ -21,6 +22,9 @@ use parity_wasm::elements::{
     self, External, ImportEntry, ImportSection, Internal, Module, NameSection, Section,
 };
 use sections::*;
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::prelude::*;
 use std::path::Path;
 
 pub const BUILTIN_PREFIX: &str = "builtin_";
@@ -119,7 +123,12 @@ fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> R
     Ok(())
 }
 
-fn patch_module(module: Module, builtins_names: &[&str]) -> Result<Module, WError> {
+type PatchedBuiltinsMap = HashMap<String, String>;
+
+fn patch_module(
+    module: Module,
+    builtins_names: &[&str],
+) -> Result<(Module, PatchedBuiltinsMap), WError> {
     let mut module = module
         .parse_names()
         .map_err(|_| WError::InternalError("Unable to parse names"))?;
@@ -142,17 +151,31 @@ fn patch_module(module: Module, builtins_names: &[&str]) -> Result<Module, WErro
         replace_function_id(&mut module, original_function_id, new_function_id)?;
         disable_function_id(&mut module, original_function_id)?;
     }
-    Ok(module)
+
+    let mut patched_builtins_map = HashMap::with_capacity(builtins.len());
+    for builtin in builtins {
+        patched_builtins_map.insert(builtin.name.clone(), builtin.import_name());
+    }
+    Ok((module, patched_builtins_map))
 }
 
 fn patch_file<P: AsRef<Path>>(
     path_in: P,
     path_out: P,
     builtins_names: &[&str],
-) -> Result<(), WError> {
+) -> Result<PatchedBuiltinsMap, WError> {
     let module = parity_wasm::deserialize_file(path_in)?;
-    let patched_module = patch_module(module, builtins_names)?;
+    let (patched_module, patched_builtins_map) = patch_module(module, builtins_names)?;
     elements::serialize_to_file(path_out, patched_module)?;
+    Ok(patched_builtins_map)
+}
+
+fn write_builtins_map<P: AsRef<Path>>(
+    builtins_map_path: P,
+    patched_builtins_map: &PatchedBuiltinsMap,
+) -> Result<(), WError> {
+    let json = serde_json::to_string_pretty(&patched_builtins_map).map_err(|_| WError::ParseError)?;
+    File::create(builtins_map_path)?.write_all(json.as_bytes())?;
     Ok(())
 }
 
@@ -165,6 +188,9 @@ fn main() -> Result<(), WError> {
         .filter(|symbol| symbol.name.starts_with(BUILTIN_PREFIX))
         .map(|symbol| &symbol.name[BUILTIN_PREFIX.len()..])
         .collect();
-    patch_file(config.input_path, config.output_path, &builtins_names)?;
+    let patched_builtins_map = patch_file(config.input_path, config.output_path, &builtins_names)?;
+    if let Some(builtins_map_path) = config.builtins_map_path {
+        write_builtins_map(builtins_map_path, &patched_builtins_map)?;
+    }
     Ok(())
 }

@@ -7,6 +7,7 @@ pub struct Config {
     pub input_path: PathBuf,
     pub output_path: PathBuf,
     pub builtins_path: PathBuf,
+    pub builtins_map_path: Option<PathBuf>,
 }
 
 impl Config {
@@ -38,6 +39,14 @@ impl Config {
                     .required(true)
                     .help("Path to the builtins library"),
             )
+            .arg(
+                Arg::with_name("builtins_map_file")
+                    .short("m")
+                    .long("builtins-map")
+                    .takes_value(true)
+                    .required(false)
+                    .help("Path to the builtins map file"),
+            )
             .get_matches();
         let input_path = PathBuf::from(matches
             .value_of("input_file")
@@ -48,10 +57,14 @@ impl Config {
         let builtins_path = PathBuf::from(matches
             .value_of("builtins_file")
             .ok_or(WError::UsageError("Builtins file required"))?);
+        let builtins_map_path = matches
+            .value_of("builtins_map_file")
+            .map(|path| PathBuf::from(path));
         let config = Config {
             input_path,
             output_path,
             builtins_path,
+            builtins_map_path,
         };
         Ok(config)
     }

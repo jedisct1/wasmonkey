@@ -25,11 +25,13 @@ impl From<Vec<ExtractedSymbol>> for ExtractedSymbols {
 fn parse_elf(elf: &Elf) -> Result<ExtractedSymbols, WError> {
     let mut symbols = vec![];
 
-    for symbol in elf.dynsyms
+    for symbol in elf
+        .dynsyms
         .iter()
         .filter(|symbol| symbol.st_info == 0x12 || symbol.st_info == 0x22)
     {
-        let name = elf.dynstrtab
+        let name = elf
+            .dynstrtab
             .get(symbol.st_name)
             .ok_or(WError::ParseError)?
             .map_err(|_| WError::ParseError)?
