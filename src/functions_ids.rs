@@ -1,6 +1,6 @@
 use errors::*;
 use parity_wasm::elements::{
-    CodeSection, ExportSection, FuncBody, Internal, Module, Opcode, Opcodes,
+    CodeSection, ElementSection, ExportSection, FuncBody, Internal, Module, Opcode, Opcodes,
 };
 
 fn shift_function_ids_in_code_section(
@@ -33,12 +33,28 @@ fn shift_function_ids_in_exports_section(
     Ok(())
 }
 
+fn shift_function_ids_in_elements_section(
+    elements_section: &mut ElementSection,
+    shift: u32,
+) -> Result<(), WError> {
+    for elements_segment in elements_section.entries_mut() {
+        for function_id in elements_segment.members_mut() {
+            *function_id += shift;
+        }
+    }
+    Ok(())
+}
+
 pub fn shift_function_ids(module: &mut Module, shift: u32) -> Result<(), WError> {
     shift_function_ids_in_code_section(module.code_section_mut().expect("No code section"), shift)?;
 
     module
         .export_section_mut()
         .map(|export_section| shift_function_ids_in_exports_section(export_section, shift));
+
+    module
+        .elements_section_mut()
+        .map(|elements_section| shift_function_ids_in_elements_section(elements_section, shift));
 
     Ok(())
 }
