@@ -13,9 +13,6 @@ fn shift_function_ids_in_code_section(
         for opcode in opcodes.iter_mut() {
             match opcode {
                 Opcode::Call(function_id) => *opcode = Opcode::Call(*function_id + shift),
-                Opcode::CallIndirect(function_id, count) => {
-                    *opcode = Opcode::CallIndirect(*function_id + shift, *count)
-                }
                 _ => {}
             }
         }
@@ -55,9 +52,6 @@ pub fn replace_function_id(module: &mut Module, before: u32, after: u32) -> Resu
             match opcode {
                 Opcode::Call(function_id) if *function_id == before => {
                     *opcode = Opcode::Call(after)
-                }
-                Opcode::CallIndirect(function_id, count) if *function_id == before => {
-                    *opcode = Opcode::CallIndirect(after, *count)
                 }
                 _ => {}
             }
