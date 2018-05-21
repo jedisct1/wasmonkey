@@ -148,7 +148,6 @@ fn patch_module(
         let original_function_id = builtin.original_function_id.unwrap() + builtin_idx as u32 + 1;
         let new_function_id = 0;
         replace_function_id(&mut module, original_function_id, new_function_id)?;
-        disable_function_id(&mut module, original_function_id)?;
     }
 
     let mut patched_builtins_map = PatchedBuiltinsMap::with_capacity(builtins.len());
