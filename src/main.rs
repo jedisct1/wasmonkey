@@ -51,14 +51,26 @@ impl Builtin {
     }
 }
 
+fn function_type_id_for_function_id(module: &Module, function_id: u32) -> Option<u32> {
+    let offset = module
+        .import_section()
+        .map(|import_section| import_section.entries().len() as u32)
+        .unwrap_or(0);
+    if function_id < offset {
+        return None;
+    }
+    let functions_section_type_ids = module.function_section().unwrap().entries();
+    Some(functions_section_type_ids[(function_id - offset) as usize].type_ref())
+}
+
 fn add_function_type_id_to_builtins(
     module: &Module,
     builtins: &mut Vec<Builtin>,
 ) -> Result<(), WError> {
-    let functions_type_ids = module.function_section().unwrap().entries();
     for builtin in builtins.iter_mut() {
         let function_type_id =
-            functions_type_ids[builtin.original_function_id.unwrap() as usize].type_ref();
+            function_type_id_for_function_id(module, builtin.original_function_id.unwrap())
+                .expect("Function ID not found");
         builtin.function_type_id = Some(function_type_id);
     }
     Ok(())

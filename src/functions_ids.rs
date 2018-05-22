@@ -77,6 +77,7 @@ pub fn replace_function_id(module: &mut Module, before: u32, after: u32) -> Resu
     Ok(())
 }
 
+#[allow(dead_code)]
 pub fn disable_function_id(module: &mut Module, function_id: u32) -> Result<(), WError> {
     let base_id = match module.import_section() {
         None => 0,
