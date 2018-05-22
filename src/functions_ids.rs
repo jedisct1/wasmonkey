@@ -1,6 +1,7 @@
 use errors::*;
 use parity_wasm::elements::{
-    CodeSection, ElementSection, ExportSection, FuncBody, Internal, Module, Opcode, Opcodes,
+    CodeSection, ElementSection, ExportSection, FuncBody, Instruction, Instructions, Internal,
+    Module,
 };
 
 fn shift_function_ids_in_code_section(
@@ -12,7 +13,7 @@ fn shift_function_ids_in_code_section(
         let opcodes = code_body.code_mut().elements_mut();
         for opcode in opcodes.iter_mut() {
             match opcode {
-                Opcode::Call(function_id) => *opcode = Opcode::Call(*function_id + shift),
+                Instruction::Call(function_id) => *opcode = Instruction::Call(*function_id + shift),
                 _ => {}
             }
         }
@@ -66,8 +67,8 @@ pub fn replace_function_id(module: &mut Module, before: u32, after: u32) -> Resu
         let opcodes = code_body.code_mut().elements_mut();
         for opcode in opcodes.iter_mut() {
             match opcode {
-                Opcode::Call(function_id) if *function_id == before => {
-                    *opcode = Opcode::Call(after)
+                Instruction::Call(function_id) if *function_id == before => {
+                    *opcode = Instruction::Call(after)
                 }
                 _ => {}
             }
@@ -83,7 +84,7 @@ pub fn disable_function_id(module: &mut Module, function_id: u32) -> Result<(), 
     };
     let code_section = module.code_section_mut().expect("No code section");
     let code_bodies = code_section.bodies_mut();
-    let opcodes = Opcodes::new(vec![Opcode::Unreachable, Opcode::End]);
+    let opcodes = Instructions::new(vec![Instruction::Unreachable, Instruction::End]);
     let func_body = FuncBody::new(vec![], opcodes);
     code_bodies[(function_id - base_id) as usize] = func_body;
     Ok(())
