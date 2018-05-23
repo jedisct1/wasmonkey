@@ -182,7 +182,8 @@ fn patch_file<P: AsRef<Path>>(
 
 fn main() -> Result<(), WError> {
     let config = Config::parse_cmdline()?;
-    let symbols = symbols::extract_symbols(config.builtins_path)?;
+    let symbols = symbols::extract_symbols(config.builtins_path)?
+        .merge_additional(config.builtins_additional);
     let builtins_names = symbols.builtins_names();
     let patched_builtins_map = patch_file(config.input_path, config.output_path, &builtins_names)?;
     if let Some(builtins_map_path) = config.builtins_map_path {

@@ -33,6 +33,16 @@ impl ExtractedSymbols {
             .collect();
         builtins_names
     }
+
+    pub fn merge_additional(mut self, additional_names: Vec<String>) -> Self {
+        let mut additional_symbols: Vec<_> = additional_names
+            .into_iter()
+            .map(|name| ExtractedSymbol { name })
+            .collect();
+        self.symbols.append(&mut additional_symbols);
+        self.symbols.dedup_by(|a, b| a.name == b.name);
+        self
+    }
 }
 
 fn parse_elf(elf: &Elf) -> Result<ExtractedSymbols, WError> {

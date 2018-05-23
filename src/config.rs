@@ -9,6 +9,7 @@ pub struct Config {
     pub builtins_path: PathBuf,
     pub builtins_map_path: Option<PathBuf>,
     pub builtins_map_original_names: bool,
+    pub builtins_additional: Vec<String>,
 }
 
 impl Config {
@@ -41,6 +42,15 @@ impl Config {
                     .help("Path to the builtins library"),
             )
             .arg(
+                Arg::with_name("builtins_additional")
+                    .short("B")
+                    .long("builtins-additional")
+                    .takes_value(true)
+                    .required(false)
+                    .multiple(true)
+                    .help("Additional builtins function names to replace"),
+            )
+            .arg(
                 Arg::with_name("builtins_map_file")
                     .short("m")
                     .long("builtins-map")
@@ -66,16 +76,20 @@ impl Config {
         let builtins_path = PathBuf::from(matches
             .value_of("builtins_file")
             .ok_or(WError::UsageError("Builtins file required"))?);
-        let builtins_map_path = matches
-            .value_of("builtins_map_file")
-            .map(|path| PathBuf::from(path));
+        let builtins_map_path = matches.value_of("builtins_map_file").map(PathBuf::from);
         let builtins_map_original_names = matches.is_present("builtins_map_original_names");
+        let builtins_additional = matches
+            .values_of("builtins_additional")
+            .unwrap_or_default()
+            .map(|name| name.to_string())
+            .collect();
         let config = Config {
             input_path,
             output_path,
             builtins_path,
             builtins_map_path,
             builtins_map_original_names,
+            builtins_additional,
         };
         Ok(config)
     }

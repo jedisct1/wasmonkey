@@ -12,9 +12,8 @@ fn shift_function_ids_in_code_section(
     for code_body in code_bodies.iter_mut() {
         let opcodes = code_body.code_mut().elements_mut();
         for opcode in opcodes.iter_mut() {
-            match opcode {
-                Instruction::Call(function_id) => *opcode = Instruction::Call(*function_id + shift),
-                _ => {}
+            if let Instruction::Call(function_id) = opcode {
+                *opcode = Instruction::Call(*function_id + shift)
             }
         }
     }
