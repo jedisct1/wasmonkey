@@ -1,8 +1,8 @@
-use super::BUILTIN_PREFIX;
 use errors::*;
 use goblin::elf::Elf;
 use goblin::mach::{self, Mach, MachO};
 use goblin::Object;
+use patcher::BUILTIN_PREFIX;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
