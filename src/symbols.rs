@@ -34,10 +34,12 @@ impl ExtractedSymbols {
         builtins_names
     }
 
-    pub fn merge_additional(mut self, additional_names: Vec<String>) -> Self {
+    pub fn merge_additional(mut self, additional_names: &[String]) -> Self {
         let mut additional_symbols: Vec<_> = additional_names
             .into_iter()
-            .map(|name| ExtractedSymbol { name })
+            .map(|name| ExtractedSymbol {
+                name: name.to_string(),
+            })
             .collect();
         self.symbols.append(&mut additional_symbols);
         self.symbols.dedup_by(|a, b| a.name == b.name);

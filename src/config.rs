@@ -1,3 +1,4 @@
+use super::PatcherConfig;
 use clap::{App, Arg};
 use errors::*;
 use std::path::PathBuf;
@@ -6,10 +7,7 @@ use std::path::PathBuf;
 pub struct Config {
     pub input_path: PathBuf,
     pub output_path: PathBuf,
-    pub builtins_path: PathBuf,
-    pub builtins_map_path: Option<PathBuf>,
-    pub builtins_map_original_names: bool,
-    pub builtins_additional: Vec<String>,
+    pub patcher_config: PatcherConfig,
 }
 
 impl Config {
@@ -86,10 +84,12 @@ impl Config {
         let config = Config {
             input_path,
             output_path,
-            builtins_path,
-            builtins_map_path,
-            builtins_map_original_names,
-            builtins_additional,
+            patcher_config: PatcherConfig {
+                builtins_path,
+                builtins_map_path,
+                builtins_map_original_names,
+                builtins_additional,
+            },
         };
         Ok(config)
     }
