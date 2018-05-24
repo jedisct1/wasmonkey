@@ -8,13 +8,13 @@ use parity_wasm::elements::{
 };
 use sections::*;
 use std::path::{Path, PathBuf};
-use symbols;
+use symbols::{self, ExtractedSymbols};
 
 pub const BUILTIN_PREFIX: &str = "builtin_";
 
 #[derive(Default, Clone, Debug)]
 pub struct PatcherConfig {
-    pub builtins_path: PathBuf,
+    pub builtins_path: Option<PathBuf>,
     pub builtins_map_path: Option<PathBuf>,
     pub builtins_map_original_names: bool,
     pub builtins_additional: Vec<String>,
@@ -28,8 +28,10 @@ pub struct Patcher {
 
 impl Patcher {
     pub fn from_file<P: AsRef<Path>>(config: PatcherConfig, path_in: P) -> Result<Self, WError> {
-        let symbols = symbols::extract_symbols(&config.builtins_path)?
-            .merge_additional(&config.builtins_additional);
+        let symbols = match &config.builtins_path {
+            None => ExtractedSymbols::from(vec![]),
+            Some(builtins_path) => symbols::extract_symbols(&builtins_path)?,
+        }.merge_additional(&config.builtins_additional);
         let builtins_names = symbols.builtins_names();
         let module = parity_wasm::deserialize_file(path_in)?;
         let (patched_module, patched_builtins_map) = patch_module(module, &builtins_names)?;
@@ -48,6 +50,11 @@ impl Patcher {
                 .write_to_file(builtins_map_path, self.config.builtins_map_original_names)?;
         }
         Ok(())
+    }
+
+    pub fn to_bytes(self) -> Result<Vec<u8>, WError> {
+        let bytes = elements::serialize(self.patched_module)?;
+        Ok(bytes)
     }
 }
 

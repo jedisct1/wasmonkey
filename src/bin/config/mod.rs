@@ -35,7 +35,7 @@ impl Config {
                     .short("b")
                     .long("builtins")
                     .takes_value(true)
-                    .required(true)
+                    .required(false)
                     .help("Path to the builtins library"),
             )
             .arg(
@@ -70,9 +70,7 @@ impl Config {
         let output_path = PathBuf::from(matches
             .value_of("output_file")
             .ok_or(WError::UsageError("Output file required"))?);
-        let builtins_path = PathBuf::from(matches
-            .value_of("builtins_file")
-            .ok_or(WError::UsageError("Builtins file required"))?);
+        let builtins_path = matches.value_of("builtins_file").map(PathBuf::from);
         let builtins_map_path = matches.value_of("builtins_map_file").map(PathBuf::from);
         let builtins_map_original_names = matches.is_present("builtins_map_original_names");
         let builtins_additional = matches
