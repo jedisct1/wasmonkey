@@ -27,13 +27,12 @@ pub struct Patcher {
 }
 
 impl Patcher {
-    pub fn from_file<P: AsRef<Path>>(config: PatcherConfig, path_in: P) -> Result<Self, WError> {
+    pub fn new(config: PatcherConfig, module: Module) -> Result<Self, WError> {
         let symbols = match &config.builtins_path {
             None => ExtractedSymbols::from(vec![]),
             Some(builtins_path) => symbols::extract_symbols(&builtins_path)?,
         }.merge_additional(&config.builtins_additional);
         let builtins_names = symbols.builtins_names();
-        let module = parity_wasm::deserialize_file(path_in)?;
         let (patched_module, patched_builtins_map) = patch_module(module, &builtins_names)?;
         let patcher = Patcher {
             config,
@@ -43,6 +42,21 @@ impl Patcher {
         Ok(patcher)
     }
 
+    pub fn from_bytes(config: PatcherConfig, bytes: &[u8]) -> Result<Self, WError> {
+        let module = parity_wasm::deserialize_buffer(bytes)?;
+        Self::new(config, module)
+    }
+
+    pub fn from_file<P: AsRef<Path>>(config: PatcherConfig, path_in: P) -> Result<Self, WError> {
+        let module = parity_wasm::deserialize_file(path_in)?;
+        Self::new(config, module)
+    }
+
+    pub fn to_bytes(self) -> Result<Vec<u8>, WError> {
+        let bytes = elements::serialize(self.patched_module)?;
+        Ok(bytes)
+    }
+
     pub fn store_to_file<P: AsRef<Path>>(self, path_out: P) -> Result<(), WError> {
         elements::serialize_to_file(path_out, self.patched_module)?;
         if let Some(builtins_map_path) = self.config.builtins_map_path {
@@ -50,11 +64,6 @@ impl Patcher {
                 .write_to_file(builtins_map_path, self.config.builtins_map_original_names)?;
         }
         Ok(())
-    }
-
-    pub fn to_bytes(self) -> Result<Vec<u8>, WError> {
-        let bytes = elements::serialize(self.patched_module)?;
-        Ok(bytes)
     }
 }
 
@@ -79,7 +88,7 @@ impl Builtin {
     }
 }
 
-fn function_type_id_for_function_id(module: &Module, function_id: u32) -> Option<u32> {
+fn function_type_id_for_function_id(&self, function_id: u32) -> Option<u32> {
     let offset = module
         .import_section()
         .map(|import_section| import_section.entries().len() as u32)
