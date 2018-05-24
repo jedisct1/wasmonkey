@@ -20,42 +20,31 @@ fn shift_function_ids_in_code_section(
     Ok(())
 }
 
-fn shift_function_ids_in_exports_section(
-    export_section: &mut ExportSection,
-    shift: u32,
-) -> Result<(), WError> {
+fn shift_function_ids_in_exports_section(export_section: &mut ExportSection, shift: u32) {
     for entry in export_section.entries_mut() {
         let internal = entry.internal_mut();
         if let Internal::Function(function_id) = internal {
             *internal = Internal::Function(*function_id + shift)
         }
     }
-    Ok(())
 }
 
-fn shift_function_ids_in_elements_section(
-    elements_section: &mut ElementSection,
-    shift: u32,
-) -> Result<(), WError> {
+fn shift_function_ids_in_elements_section(elements_section: &mut ElementSection, shift: u32) {
     for elements_segment in elements_section.entries_mut() {
         for function_id in elements_segment.members_mut() {
             *function_id += shift;
         }
     }
-    Ok(())
 }
 
 pub fn shift_function_ids(module: &mut Module, shift: u32) -> Result<(), WError> {
     shift_function_ids_in_code_section(module.code_section_mut().expect("No code section"), shift)?;
-
-    module
-        .export_section_mut()
-        .map(|export_section| shift_function_ids_in_exports_section(export_section, shift));
-
-    module
-        .elements_section_mut()
-        .map(|elements_section| shift_function_ids_in_elements_section(elements_section, shift));
-
+    if let Some(export_section) = module.export_section_mut() {
+        shift_function_ids_in_exports_section(export_section, shift)
+    }
+    if let Some(elements_section) = module.elements_section_mut() {
+        shift_function_ids_in_elements_section(elements_section, shift)
+    }
     Ok(())
 }
 
@@ -89,13 +78,13 @@ fn replace_function_id_in_elements_section(
 }
 
 pub fn replace_function_id(module: &mut Module, before: u32, after: u32) -> Result<(), WError> {
-    module
-        .code_section_mut()
-        .map(|code_section| replace_function_id_in_code_section(code_section, before, after));
+    if let Some(code_section) = module.code_section_mut() {
+        replace_function_id_in_code_section(code_section, before, after)
+    }
 
-    module.elements_section_mut().map(|elements_section| {
+    if let Some(elements_section) = module.elements_section_mut() {
         replace_function_id_in_elements_section(elements_section, before, after)
-    });
+    };
 
     Ok(())
 }

@@ -52,7 +52,7 @@ impl Patcher {
         Self::new(config, module)
     }
 
-    pub fn to_bytes(self) -> Result<Vec<u8>, WError> {
+    pub fn into_bytes(self) -> Result<Vec<u8>, WError> {
         let bytes = elements::serialize(self.patched_module)?;
         Ok(bytes)
     }

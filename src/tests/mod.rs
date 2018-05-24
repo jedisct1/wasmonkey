@@ -13,7 +13,7 @@ fn patch_nothing() {
     let config = PatcherConfig::default();
     let patcher = Patcher::from_file(config, path_in).unwrap();
     let mut hasher = SipHasher13::new();
-    hasher.write(&patcher.to_bytes().unwrap());
+    hasher.write(&patcher.into_bytes().unwrap());
     assert_eq!(hasher.finish(), 1401932366200566186);
 }
 
@@ -27,7 +27,7 @@ fn patch_one() {
         .collect();
     let patcher = Patcher::from_file(config, path_in).unwrap();
     let mut hasher = SipHasher13::new();
-    hasher.write(&patcher.to_bytes().unwrap());
+    hasher.write(&patcher.into_bytes().unwrap());
     assert_eq!(hasher.finish(), 12884721342785729260);
 }
 
@@ -41,6 +41,6 @@ fn patch_some() {
         .collect();
     let patcher = Patcher::from_file(config, path_in).unwrap();
     let mut hasher = SipHasher13::new();
-    hasher.write(&patcher.to_bytes().unwrap());
+    hasher.write(&patcher.into_bytes().unwrap());
     assert_eq!(hasher.finish(), 13205801729184435761);
 }
