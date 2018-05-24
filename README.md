@@ -6,7 +6,8 @@ functions with imported functions from another library.
 ## Usage
 
 ```text
-    wasmonkey [OPTIONS] --builtins <builtins_file> --input <input_file> --output <output_file>
+USAGE:
+    wasmonkey [FLAGS] [OPTIONS] --input <input_file> --output <output_file>
 
 FLAGS:
     -n, --original-names    Use the original name as a key in the builtins map
@@ -14,10 +15,11 @@ FLAGS:
     -V, --version           Prints version information
 
 OPTIONS:
-    -b, --builtins <builtins_file>            Path to the builtins library
-    -m, --builtins-map <builtins_map_file>    Path to the builtins map file
-    -i, --input <input_file>                  Path to the input file
-    -o, --output <output_file>                Path to the output file
+    -B, --builtins-additional <builtins_additional>...    Additional builtins function names to replace
+    -b, --builtins <builtins_file>                        Path to the builtins library
+    -m, --builtins-map <builtins_map_file>                Path to the builtins map file
+    -i, --input <input_file>                              Path to the input file
+    -o, --output <output_file>                            Path to the output file
 ```
 
 `builtins_file` is an object containing alternative implementations to
