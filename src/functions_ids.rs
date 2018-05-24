@@ -59,8 +59,7 @@ pub fn shift_function_ids(module: &mut Module, shift: u32) -> Result<(), WError>
     Ok(())
 }
 
-pub fn replace_function_id(module: &mut Module, before: u32, after: u32) -> Result<(), WError> {
-    let code_section = module.code_section_mut().expect("No code section");
+fn replace_function_id_in_code_section(code_section: &mut CodeSection, before: u32, after: u32) {
     let code_bodies = code_section.bodies_mut();
     for code_body in code_bodies.iter_mut() {
         let opcodes = code_body.code_mut().elements_mut();
@@ -73,6 +72,31 @@ pub fn replace_function_id(module: &mut Module, before: u32, after: u32) -> Resu
             }
         }
     }
+}
+
+fn replace_function_id_in_elements_section(
+    elements_section: &mut ElementSection,
+    before: u32,
+    after: u32,
+) {
+    for elements_segment in elements_section.entries_mut() {
+        for function_id in elements_segment.members_mut() {
+            if *function_id == before {
+                *function_id = after;
+            }
+        }
+    }
+}
+
+pub fn replace_function_id(module: &mut Module, before: u32, after: u32) -> Result<(), WError> {
+    module
+        .code_section_mut()
+        .map(|code_section| replace_function_id_in_code_section(code_section, before, after));
+
+    module.elements_section_mut().map(|elements_section| {
+        replace_function_id_in_elements_section(elements_section, before, after)
+    });
+
     Ok(())
 }
 

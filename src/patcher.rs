@@ -88,7 +88,7 @@ impl Builtin {
     }
 }
 
-fn function_type_id_for_function_id(&self, function_id: u32) -> Option<u32> {
+fn function_type_id_for_function_id(module: &Module, function_id: u32) -> Option<u32> {
     let offset = module
         .import_section()
         .map(|import_section| import_section.entries().len() as u32)
