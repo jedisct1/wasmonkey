@@ -68,10 +68,8 @@ impl Patcher {
     }
 
     pub fn builtins_map(&self, module: &str) -> Result<HashMap<String, String>, WError> {
-        if module != "env" {
-            xbail!(WError::UsageError("Empty module"))
-        }
-        Ok(self.patched_builtins_map.env.clone())
+        self.patched_builtins_map
+            .builtins_map(module, self.config.builtins_map_original_names)
     }
 }
 

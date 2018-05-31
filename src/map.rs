@@ -42,4 +42,22 @@ impl PatchedBuiltinsMap {
         File::create(builtins_map_path)?.write_all(json.as_bytes())?;
         Ok(())
     }
+
+    pub fn builtins_map(
+        &self,
+        module: &str,
+        original_names: bool,
+    ) -> Result<HashMap<String, String>, WError> {
+        if module != "env" {
+            xbail!(WError::UsageError("Empty module"))
+        }
+        if original_names {
+            return Ok(self.env.clone());
+        }
+        let mut env_map_with_original_names = HashMap::new();
+        for imported_name in self.env.values() {
+            env_map_with_original_names.insert(imported_name.clone(), imported_name.clone());
+        }
+        Ok(env_map_with_original_names)
+    }
 }
