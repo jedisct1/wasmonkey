@@ -6,7 +6,7 @@ description = "Patch a WASM object file to replace a set of exported functions w
 license = "ISC"
 homepage = "https://github.com/jedisct1/wasmonkey"
 repository = "https://github.com/jedisct1/wasmonkey"
-categories = ["webassembly"]
+categories = ["wasm"]
 
 [dependencies]
 clap = "2.31.2"
