@@ -7,6 +7,7 @@ use parity_wasm::elements::{
     self, External, ImportEntry, ImportSection, Internal, Module, NameSection, Section,
 };
 use sections::*;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use symbols::{self, ExtractedSymbols};
 
@@ -64,6 +65,13 @@ impl Patcher {
                 .write_to_file(builtins_map_path, self.config.builtins_map_original_names)?;
         }
         Ok(())
+    }
+
+    pub fn builtins_map(&self, module: &str) -> Result<HashMap<String, String>, WError> {
+        if module != "env" {
+            xbail!(WError::UsageError("Empty module"))
+        }
+        Ok(self.patched_builtins_map.env.clone())
     }
 }
 
