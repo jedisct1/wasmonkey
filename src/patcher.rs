@@ -71,6 +71,10 @@ impl Patcher {
         self.patched_builtins_map
             .builtins_map(module, self.config.builtins_map_original_names)
     }
+
+    pub fn patched_module(self) -> Module {
+        self.patched_module
+    }
 }
 
 #[derive(Debug)]
