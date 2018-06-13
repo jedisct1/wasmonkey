@@ -12,8 +12,8 @@ fn shift_function_ids_in_code_section(
     for code_body in code_bodies.iter_mut() {
         let opcodes = code_body.code_mut().elements_mut();
         for opcode in opcodes.iter_mut() {
-            if let Instruction::Call(function_id) = opcode {
-                *opcode = Instruction::Call(*function_id + shift)
+            if let Instruction::Call(function_id) = *opcode {
+                *opcode = Instruction::Call(function_id + shift)
             }
         }
     }
@@ -23,8 +23,8 @@ fn shift_function_ids_in_code_section(
 fn shift_function_ids_in_exports_section(export_section: &mut ExportSection, shift: u32) {
     for entry in export_section.entries_mut() {
         let internal = entry.internal_mut();
-        if let Internal::Function(function_id) = internal {
-            *internal = Internal::Function(*function_id + shift)
+        if let Internal::Function(function_id) = *internal {
+            *internal = Internal::Function(function_id + shift)
         }
     }
 }
@@ -53,8 +53,8 @@ fn replace_function_id_in_code_section(code_section: &mut CodeSection, before: u
     for code_body in code_bodies.iter_mut() {
         let opcodes = code_body.code_mut().elements_mut();
         for opcode in opcodes.iter_mut() {
-            match opcode {
-                Instruction::Call(function_id) if *function_id == before => {
+            match *opcode {
+                Instruction::Call(function_id) if function_id == before => {
                     *opcode = Instruction::Call(after)
                 }
                 _ => {}
