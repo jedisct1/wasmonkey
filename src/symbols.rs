@@ -36,7 +36,7 @@ impl ExtractedSymbols {
 
     pub fn merge_additional(mut self, additional_names: &[String]) -> Self {
         let mut additional_symbols: Vec<_> = additional_names
-            .into_iter()
+            .iter()
             .map(|name| ExtractedSymbol {
                 name: name.to_string(),
             })
