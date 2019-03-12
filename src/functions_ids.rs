@@ -1,4 +1,4 @@
-use errors::*;
+use crate::errors::*;
 use parity_wasm::elements::{
     CodeSection, ElementSection, ExportSection, FuncBody, Instruction, Instructions, Internal,
     Module,

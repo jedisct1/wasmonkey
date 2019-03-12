@@ -1,8 +1,8 @@
-use errors::*;
+use crate::errors::*;
+use crate::patcher::BUILTIN_PREFIX;
 use goblin::elf::Elf;
 use goblin::mach::{self, Mach, MachO};
 use goblin::Object;
-use patcher::BUILTIN_PREFIX;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -47,7 +47,7 @@ impl ExtractedSymbols {
     }
 }
 
-fn parse_elf(elf: &Elf) -> Result<ExtractedSymbols, WError> {
+fn parse_elf(elf: &Elf<'_>) -> Result<ExtractedSymbols, WError> {
     let mut symbols = vec![];
 
     for symbol in elf
@@ -67,7 +67,7 @@ fn parse_elf(elf: &Elf) -> Result<ExtractedSymbols, WError> {
     Ok(symbols.into())
 }
 
-fn parse_macho(macho: &MachO) -> Result<ExtractedSymbols, WError> {
+fn parse_macho(macho: &MachO<'_>) -> Result<ExtractedSymbols, WError> {
     let mut symbols = vec![];
 
     // Start by finding the boundaries of the text section
@@ -105,8 +105,7 @@ fn parse_macho(macho: &MachO) -> Result<ExtractedSymbols, WError> {
                     n_value,
                     ..
                 },
-            )) if name.len() > 1 && name.starts_with('_') =>
-            {
+            )) if name.len() > 1 && name.starts_with('_') => {
                 let extracted_symbol = ExtractedSymbol {
                     name: name[1..].to_string(),
                 };

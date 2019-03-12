@@ -1,4 +1,4 @@
-use errors::*;
+use crate::errors::*;
 use parity_wasm::elements::{FunctionNameSection, IndexMap};
 
 pub fn prepend_function_name(

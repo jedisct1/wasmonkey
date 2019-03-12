@@ -1,15 +1,15 @@
-use errors::*;
-use functions_ids::*;
-use functions_names::*;
-use map::*;
+use crate::errors::*;
+use crate::functions_ids::*;
+use crate::functions_names::*;
+use crate::map::*;
+use crate::sections::*;
+use crate::symbols::{self, ExtractedSymbols};
 use parity_wasm;
 use parity_wasm::elements::{
     self, External, ImportEntry, ImportSection, Internal, Module, NameSection, Section,
 };
-use sections::*;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use symbols::{self, ExtractedSymbols};
 
 pub const BUILTIN_PREFIX: &str = "builtin_";
 
@@ -32,7 +32,8 @@ impl Patcher {
         let symbols = match &config.builtins_path {
             None => ExtractedSymbols::from(vec![]),
             Some(builtins_path) => symbols::extract_symbols(&builtins_path)?,
-        }.merge_additional(&config.builtins_additional);
+        }
+        .merge_additional(&config.builtins_additional);
         let builtins_names = symbols.builtins_names();
         let (patched_module, patched_builtins_map) = patch_module(module, &builtins_names)?;
         let patcher = Patcher {
