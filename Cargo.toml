@@ -12,7 +12,7 @@ edition = "2018"
 [dependencies]
 clap = "2.33"
 failure = "0.1"
-goblin = "0.0.24"
+goblin = "0.1"
 lazy_static = "1.4"
 parity-wasm = "0.41"
 serde = "1.0"
