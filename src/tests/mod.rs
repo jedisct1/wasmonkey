@@ -22,7 +22,7 @@ fn patch_one() {
     let path_in = TESTS_DIR.join("test_1.wasm");
     let mut config = PatcherConfig::default();
     config.builtins_additional = ["builtin_memmove", "builtin_nonexistent", "not_a_builtin"]
-        .into_iter()
+        .iter()
         .map(|s| s.to_string())
         .collect();
     let patcher = Patcher::from_file(config, path_in).unwrap();
@@ -36,7 +36,7 @@ fn patch_some() {
     let path_in = TESTS_DIR.join("test_1.wasm");
     let mut config = PatcherConfig::default();
     config.builtins_additional = ["builtin_memmove", "builtin_memcpy", "builtin_strcmp"]
-        .into_iter()
+        .iter()
         .map(|s| s.to_string())
         .collect();
     let patcher = Patcher::from_file(config, path_in).unwrap();
