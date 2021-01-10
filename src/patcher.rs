@@ -4,7 +4,7 @@ use crate::functions_names::*;
 use crate::map::*;
 use crate::sections::*;
 use crate::symbols::{self, ExtractedSymbols};
-use parity_wasm;
+
 use parity_wasm::elements::{
     self, External, FunctionNameSubsection, ImportEntry, ImportSection, Internal, Module,
     NameSection, Section,

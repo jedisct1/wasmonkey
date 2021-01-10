@@ -5,7 +5,7 @@ pub fn prepend_function_name(
     function_names_subsection: &mut FunctionNameSubsection,
     name: String,
 ) -> Result<(), WError> {
-    let mut map_new = IndexMap::with_capacity(function_names_subsection.names().len() + 1 as usize);
+    let mut map_new = IndexMap::with_capacity(function_names_subsection.names().len() + 1_usize);
     for (idx, name) in function_names_subsection.names() {
         map_new.insert(idx + 1, name.clone());
     }
