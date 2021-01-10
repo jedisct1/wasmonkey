@@ -185,7 +185,7 @@ fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> R
         .expect("Names section not present");
     let function_names_subsection = match names_section.functions_mut() {
         Some(function_names_subsection) => function_names_subsection,
-        _ => xbail!(WError::InternalError("Unexpected names section")),
+        _ => return Err(WError::InternalError("Unexpected names section")),
     };
     prepend_function_name(function_names_subsection, import_name)?;
     Ok(())

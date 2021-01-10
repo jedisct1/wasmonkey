@@ -1,31 +1,16 @@
-use parity_wasm::elements;
-use std::io;
-
 #[allow(dead_code)]
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum WError {
-    #[fail(display = "Internal error: {}", _0)]
+    #[error("Internal error: {0}")]
     InternalError(&'static str),
-    #[fail(display = "Incorrect usage: {}", _0)]
+    #[error("Incorrect usage: {0}")]
     UsageError(&'static str),
-    #[fail(display = "{}", _0)]
-    Io(#[cause] io::Error),
-    #[fail(display = "{}", _0)]
-    WAsmError(#[cause] elements::Error),
-    #[fail(display = "Parse error")]
+    #[error("{0}")]
+    Io(#[from] std::io::Error),
+    #[error("{0}")]
+    WAsmError(#[from] parity_wasm::elements::Error),
+    #[error("Parse error")]
     ParseError,
-    #[fail(display = "Unsupported")]
+    #[error("Unsupported")]
     Unsupported,
-}
-
-impl From<io::Error> for WError {
-    fn from(e: io::Error) -> WError {
-        WError::Io(e)
-    }
-}
-
-impl From<elements::Error> for WError {
-    fn from(e: elements::Error) -> WError {
-        WError::WAsmError(e)
-    }
 }

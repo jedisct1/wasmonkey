@@ -127,7 +127,7 @@ pub fn extract_symbols<P: AsRef<Path>>(path: P) -> Result<ExtractedSymbols, WErr
     let symbols = match Object::parse(&buffer).map_err(|_| WError::ParseError)? {
         Object::Mach(Mach::Binary(macho)) => parse_macho(&macho),
         Object::Elf(elf) => parse_elf(&elf),
-        _ => xbail!(WError::Unsupported),
+        _ => return Err(WError::Unsupported),
     }?;
     Ok(symbols)
 }
