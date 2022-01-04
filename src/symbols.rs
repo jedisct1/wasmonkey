@@ -122,13 +122,13 @@ fn parse_macho(macho: &MachO<'_>) -> Result<ExtractedSymbols, WError> {
     Ok(symbols.into())
 }
 
-pub fn extract_symbols<P: AsRef<Path>>(path: P) -> Result<ExtractedSymbols, WError> {
+pub fn extract_symbols<P: AsRef<Path>>(path: P) -> Result<ExtractedSymbols, Error> {
     let mut buffer = Vec::new();
     File::open(path)?.read_to_end(&mut buffer)?;
     let symbols = match Object::parse(&buffer).map_err(|_| WError::ParseError)? {
         Object::Mach(Mach::Binary(macho)) => parse_macho(&macho),
         Object::Elf(elf) => parse_elf(&elf),
-        _ => xbail!(WError::Unsupported),
+        _ => bail!(WError::Unsupported),
     }?;
     Ok(symbols)
 }

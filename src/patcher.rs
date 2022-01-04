@@ -29,7 +29,7 @@ pub struct Patcher {
 }
 
 impl Patcher {
-    pub fn new(config: PatcherConfig, module: Module) -> Result<Self, WError> {
+    pub fn new(config: PatcherConfig, module: Module) -> Result<Self, Error> {
         let symbols = match &config.builtins_path {
             None => ExtractedSymbols::from(vec![]),
             Some(builtins_path) => symbols::extract_symbols(&builtins_path)?,
@@ -45,12 +45,12 @@ impl Patcher {
         Ok(patcher)
     }
 
-    pub fn from_bytes(config: PatcherConfig, bytes: &[u8]) -> Result<Self, WError> {
+    pub fn from_bytes(config: PatcherConfig, bytes: &[u8]) -> Result<Self, Error> {
         let module = parity_wasm::deserialize_buffer(bytes)?;
         Self::new(config, module)
     }
 
-    pub fn from_file<P: AsRef<Path>>(config: PatcherConfig, path_in: P) -> Result<Self, WError> {
+    pub fn from_file<P: AsRef<Path>>(config: PatcherConfig, path_in: P) -> Result<Self, Error> {
         let module = parity_wasm::deserialize_file(path_in)?;
         Self::new(config, module)
     }
@@ -69,7 +69,7 @@ impl Patcher {
         Ok(())
     }
 
-    pub fn patched_builtins_map(&self, module: &str) -> Result<HashMap<String, String>, WError> {
+    pub fn patched_builtins_map(&self, module: &str) -> Result<HashMap<String, String>, Error> {
         self.patched_builtins_map
             .builtins_map(module, self.config.builtins_map_original_names)
     }
@@ -172,7 +172,7 @@ fn prepend_builtin_to_import_section(module: &mut Module, builtin: &Builtin) -> 
     Ok(())
 }
 
-fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> Result<(), WError> {
+fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> Result<(), Error> {
     let import_name = builtin.import_name();
     if module.names_section().is_none() {
         let sections = module.sections_mut();
@@ -185,7 +185,7 @@ fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> R
         .expect("Names section not present");
     let function_names_subsection = match names_section.functions_mut() {
         Some(function_names_subsection) => function_names_subsection,
-        _ => xbail!(WError::InternalError("Unexpected names section")),
+        _ => bail!(WError::InternalError("Unexpected names section")),
     };
     prepend_function_name(function_names_subsection, import_name)?;
     Ok(())
@@ -194,7 +194,7 @@ fn prepend_builtin_to_names_section(module: &mut Module, builtin: &Builtin) -> R
 fn patch_module(
     module: Module,
     builtins_names: &[&str],
-) -> Result<(Module, PatchedBuiltinsMap), WError> {
+) -> Result<(Module, PatchedBuiltinsMap), Error> {
     let mut module = module
         .parse_names()
         .map_err(|_| WError::InternalError("Unable to parse names"))?;

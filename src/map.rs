@@ -47,9 +47,9 @@ impl PatchedBuiltinsMap {
         &self,
         module: &str,
         original_names: bool,
-    ) -> Result<HashMap<String, String>, WError> {
+    ) -> Result<HashMap<String, String>, Error> {
         if module != "env" {
-            xbail!(WError::UsageError("Empty module"))
+            bail!(WError::UsageError("Empty module"));
         }
         if original_names {
             return Ok(self.env.clone());
