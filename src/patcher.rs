@@ -153,7 +153,7 @@ fn add_import_section_if_missing(module: &mut Module) -> Result<(), WError> {
         return Ok(());
     }
     let import_section = ImportSection::with_entries(vec![]);
-    let import_section_idx = find_type_section_idx(&module).unwrap() + 1;
+    let import_section_idx = find_type_section_idx(module).unwrap() + 1;
     module
         .sections_mut()
         .insert(import_section_idx, Section::Import(import_section));
@@ -209,8 +209,8 @@ fn patch_module(
 
     add_import_section_if_missing(&mut module)?;
     for (builtin_idx, builtin) in builtins.iter_mut().enumerate() {
-        prepend_builtin_to_import_section(&mut module, &builtin)?;
-        prepend_builtin_to_names_section(&mut module, &builtin)?;
+        prepend_builtin_to_import_section(&mut module, builtin)?;
+        prepend_builtin_to_names_section(&mut module, builtin)?;
         shift_function_ids(&mut module, 1)?;
         let original_function_id = builtin.original_function_id.unwrap() + builtin_idx as u32 + 1;
         let new_function_id = 0;

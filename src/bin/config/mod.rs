@@ -13,49 +13,49 @@ impl Config {
     pub fn parse_cmdline() -> Result<Self, WError> {
         let matches = app_from_crate!()
             .arg(
-                Arg::with_name("input_file")
-                    .short("i")
+                Arg::new("input_file")
+                    .short('i')
                     .long("input")
                     .takes_value(true)
                     .required(true)
                     .help("Path to the input file"),
             )
             .arg(
-                Arg::with_name("output_file")
-                    .short("o")
+                Arg::new("output_file")
+                    .short('o')
                     .long("output")
                     .takes_value(true)
                     .required(true)
                     .help("Path to the output file"),
             )
             .arg(
-                Arg::with_name("builtins_file")
-                    .short("b")
+                Arg::new("builtins_file")
+                    .short('b')
                     .long("builtins")
                     .takes_value(true)
                     .required(false)
                     .help("Path to the builtins library"),
             )
             .arg(
-                Arg::with_name("builtins_additional")
-                    .short("B")
+                Arg::new("builtins_additional")
+                    .short('B')
                     .long("builtins-additional")
                     .takes_value(true)
                     .required(false)
-                    .multiple(true)
+                    .multiple_occurrences(true)
                     .help("Additional builtins function names to replace"),
             )
             .arg(
-                Arg::with_name("builtins_map_file")
-                    .short("m")
+                Arg::new("builtins_map_file")
+                    .short('m')
                     .long("builtins-map")
                     .takes_value(true)
                     .required(false)
                     .help("Path to the builtins map file"),
             )
             .arg(
-                Arg::with_name("builtins_map_original_names")
-                    .short("n")
+                Arg::new("builtins_map_original_names")
+                    .short('n')
                     .long("original-names")
                     .takes_value(false)
                     .required(false)

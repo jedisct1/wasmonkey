@@ -10,13 +10,17 @@ categories = ["wasm"]
 edition = "2018"
 
 [dependencies]
-clap = "2.33.3"
+clap = { version = "3.0.1", default-features = false, features = [
+    "std",
+    "cargo",
+    "wrap_help",
+] }
 failure = "0.1.8"
-goblin = "0.4.2"
+goblin = "0.4.3"
 lazy_static = "1.4.0"
-parity-wasm = "0.42.1"
-serde = "1.0.115"
-serde_derive = "1.0.115"
-serde_json = "1.0.57"
-siphasher = "0.3.3"
+parity-wasm = "0.42.2"
+serde = "1.0.130"
+serde_derive = "1.0.130"
+serde_json = "1.0.72"
+siphasher = "0.3.7"
 xfailure = "0.1.0"

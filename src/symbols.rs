@@ -55,6 +55,7 @@ fn parse_elf(elf: &Elf<'_>) -> Result<ExtractedSymbols, WError> {
         .iter()
         .filter(|symbol| symbol.st_info == 0x12 || symbol.st_info == 0x22)
     {
+        #[allow(deprecated)]
         let name = elf
             .dynstrtab
             .get(symbol.st_name)
