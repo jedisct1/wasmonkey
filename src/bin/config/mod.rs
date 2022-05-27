@@ -11,7 +11,7 @@ pub struct Config {
 
 impl Config {
     pub fn parse_cmdline() -> Result<Self, WError> {
-        let matches = app_from_crate!()
+        let matches = clap::command!()
             .arg(
                 Arg::new("input_file")
                     .short('i')
