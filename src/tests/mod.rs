@@ -1,7 +1,9 @@
-use super::*;
-use siphasher::sip::SipHasher13;
 use std::hash::Hasher;
 use std::path::{Path, PathBuf};
+
+use siphasher::sip::SipHasher13;
+
+use super::*;
 
 lazy_static! {
     static ref TESTS_DIR: PathBuf = Path::new(file!()).parent().unwrap().canonicalize().unwrap();

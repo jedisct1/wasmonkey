@@ -1,7 +1,8 @@
 mod config;
 
-use crate::config::*;
 use wasmonkey::*;
+
+use crate::config::*;
 
 fn main() -> Result<(), Error> {
     let config = Config::parse_cmdline()?;

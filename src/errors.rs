@@ -1,6 +1,7 @@
+use std::io;
+
 pub use anyhow::{anyhow, bail, ensure, Error};
 use parity_wasm::elements;
-use std::io;
 
 #[allow(dead_code)]
 #[derive(Debug, thiserror::Error)]

@@ -1,9 +1,9 @@
-use crate::errors::*;
-
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
+
+use crate::errors::*;
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct PatchedBuiltinsMap {

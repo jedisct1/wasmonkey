@@ -1,16 +1,17 @@
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+
+use parity_wasm::elements::{
+    self, External, FunctionNameSubsection, ImportEntry, ImportSection, Internal, Module,
+    NameSection, Section,
+};
+
 use crate::errors::*;
 use crate::functions_ids::*;
 use crate::functions_names::*;
 use crate::map::*;
 use crate::sections::*;
 use crate::symbols::{self, ExtractedSymbols};
-
-use parity_wasm::elements::{
-    self, External, FunctionNameSubsection, ImportEntry, ImportSection, Internal, Module,
-    NameSection, Section,
-};
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
 
 pub const BUILTIN_PREFIX: &str = "builtin_";
 

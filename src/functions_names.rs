@@ -1,5 +1,6 @@
-use crate::errors::*;
 use parity_wasm::elements::{FunctionNameSubsection, IndexMap};
+
+use crate::errors::*;
 
 pub fn prepend_function_name(
     function_names_subsection: &mut FunctionNameSubsection,

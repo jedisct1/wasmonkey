@@ -1,11 +1,13 @@
-use crate::errors::*;
-use crate::patcher::BUILTIN_PREFIX;
-use goblin::elf::Elf;
-use goblin::mach::{self, Mach, MachO};
-use goblin::Object;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+
+use goblin::elf::Elf;
+use goblin::mach::{self, Mach, MachO};
+use goblin::Object;
+
+use crate::errors::*;
+use crate::patcher::BUILTIN_PREFIX;
 
 #[derive(Clone, Debug, Default)]
 pub struct ExtractedSymbol {

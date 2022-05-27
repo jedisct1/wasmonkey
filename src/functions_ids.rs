@@ -1,8 +1,9 @@
-use crate::errors::*;
 use parity_wasm::elements::{
     CodeSection, ElementSection, ExportSection, FuncBody, Instruction, Instructions, Internal,
     Module,
 };
+
+use crate::errors::*;
 
 fn shift_function_ids_in_code_section(
     code_section: &mut CodeSection,
