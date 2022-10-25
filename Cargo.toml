@@ -16,7 +16,7 @@ clap = { version = "3.0.1", default-features = false, features = [
     "wrap_help",
 ] }
 anyhow = "1.0.52"
-goblin = "0.5.1"
+goblin = "0.6.0"
 lazy_static = "1.4.0"
 parity-wasm = "0.45.0"
 serde = "1.0.130"
