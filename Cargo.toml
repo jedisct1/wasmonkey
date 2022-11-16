@@ -10,7 +10,7 @@ categories = ["wasm"]
 edition = "2018"
 
 [dependencies]
-clap = { version = "3.0.1", default-features = false, features = [
+clap = { version = "4.0.25", default-features = false, features = [
     "std",
     "cargo",
     "wrap_help",
