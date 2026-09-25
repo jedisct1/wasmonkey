@@ -1,8 +1,9 @@
 [package]
+keywords = ["wasm", "webassembly", "patcher", "object-file", "cli"]
 name = "wasmonkey"
 version = "0.1.17"
 authors = ["Frank Denis <github@pureftpd.org>"]
-description = "Patch a WASM object file to replace a set of exported functions with imported functions from another library"
+description = "WebAssembly object-file patcher for replacing exported functions with imports from a builtins library"
 license = "ISC"
 homepage = "https://github.com/jedisct1/wasmonkey"
 repository = "https://github.com/jedisct1/wasmonkey"
