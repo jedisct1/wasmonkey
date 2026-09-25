@@ -1,7 +1,7 @@
 [package]
 keywords = ["wasm", "webassembly", "patcher", "object-file", "cli"]
 name = "wasmonkey"
-version = "0.1.17"
+version = "0.1.18"
 authors = ["Frank Denis <github@pureftpd.org>"]
 description = "WebAssembly object-file patcher for replacing exported functions with imports from a builtins library"
 license = "ISC"
@@ -11,17 +11,17 @@ categories = ["wasm"]
 edition = "2018"
 
 [dependencies]
-clap = { version = "3.2.23", default-features = false, features = [
+clap = { version = "3.2.25", default-features = false, features = [
     "std",
     "cargo",
     "wrap_help",
 ] }
-anyhow = "1.0.68"
-goblin = "0.6.0"
-lazy_static = "1.4.0"
+anyhow = "1.0.104"
+goblin = "0.6.1"
+lazy_static = "1.5.0"
 parity-wasm = "0.45.0"
-serde = "1.0.152"
-serde_derive = "1.0.152"
-serde_json = "1.0.91"
-siphasher = "0.3.10"
-thiserror = "1.0.38"
+serde = "1.0.229"
+serde_derive = "1.0.229"
+serde_json = "1.0.151"
+siphasher = "0.3.11"
+thiserror = "1.0.69"
